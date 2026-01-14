@@ -71,6 +71,7 @@ Trait: ${p2Trait}
 Action: "${p2Action}"
 
 Who wins this round and what happens? Consider the traits carefully!
+Return ONLY valid JSON with keys: winner, damage, narration, crit.
 `;
 
   try {
@@ -79,8 +80,6 @@ Who wins this round and what happens? Consider the traits carefully!
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        responseMimeType: "application/json",
-        responseSchema: turnSchema,
       },
     });
 
