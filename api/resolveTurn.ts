@@ -74,8 +74,8 @@ Who wins this round and what happens? Consider the traits carefully!
 Return ONLY valid JSON with keys: winner, damage, narration, crit.
 `;
 
-  try {
-    const response = await ai.models.generateContent({
+    try {
+    const call = ai.models.generateContent({
       model: "gemini-1.5-flash",
       contents: prompt,
       config: {
@@ -83,13 +83,18 @@ Return ONLY valid JSON with keys: winner, damage, narration, crit.
       },
     });
 
+    // 8秒で打ち切り（Vercelのタイムアウトより先に返す）
+    const response = await Promise.race([
+      call,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout: Gemini took too long")), 8000)
+      ),
+    ]) as any;
+
     const jsonText = response.text;
-    if (!jsonText) {
-      return res.status(500).send("No response from AI");
-    }
+    if (!jsonText) return res.status(500).send("No response from AI");
 
     const result = JSON.parse(jsonText);
-
     return res.status(200).json({
       winner: result.winner,
       damage: result.damage,
@@ -104,4 +109,5 @@ Return ONLY valid JSON with keys: winner, damage, narration, crit.
       error: String(e?.message || e),
     });
   }
+
 }
