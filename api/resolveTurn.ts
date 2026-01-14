@@ -36,10 +36,14 @@ const turnSchema: Schema = {
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+  if (req.method !== "POST") {
+    return res.status(405).send("Method Not Allowed");
+  }
 
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).send("Missing GEMINI_API_KEY");
+  if (!apiKey) {
+    return res.status(500).send("Missing GEMINI_API_KEY");
+  }
 
   const {
     p1Name, p1Action, p1Trait,
@@ -81,9 +85,12 @@ Who wins this round and what happens? Consider the traits carefully!
     });
 
     const jsonText = response.text;
-    if (!jsonText) return res.status(500).send("No response from AI");
+    if (!jsonText) {
+      return res.status(500).send("No response from AI");
+    }
 
     const result = JSON.parse(jsonText);
+
     return res.status(200).json({
       winner: result.winner,
       damage: result.damage,
@@ -92,14 +99,10 @@ Who wins this round and what happens? Consider the traits carefully!
       p1Action,
       p2Action,
     });
-  } catch {
-    return res.status(200).json({
-      winner: "draw",
-      damage: 5,
-      narration: "次元の歪みにより、判別不能！両者に軽微なダメージ。",
-      crit: false,
-      p1Action,
-      p2Action,
+  } catch (e: any) {
+    console.error("resolveTurn error:", e);
+    return res.status(500).json({
+      error: String(e?.message || e),
     });
   }
 }
