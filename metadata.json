@@ -1,0 +1,5 @@
+{
+  "name": "Kotodama Duel (言霊バトル)",
+  "description": "A local PvP creative battle game where AI judges the outcome of players' text-based actions. プレイヤーが入力したアクションをAIが判定する、ローカル対戦型クリエイティブバトルゲーム。",
+  "requestFramePermissions": []
+}
